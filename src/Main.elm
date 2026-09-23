@@ -30,18 +30,20 @@ the same time. Replace these three fields with a type where only the real
 states can exist. See the README for more.
 
 -}
+type UnitState
+    = IsLoading
+    | Error Http.Error
+    | Success (List Unit)
+
+
 type alias Model =
-    { isLoading : Bool
-    , error : Maybe Http.Error
-    , units : List Unit
+    { state : UnitState
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { isLoading = True
-      , error = Nothing
-      , units = []
+    ( { state = IsLoading
       }
     , fetchUnits
     )
@@ -67,10 +69,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotUnits (Ok units) ->
-            ( { model | isLoading = False, units = units }, Cmd.none )
+            ( { model | state = Success units }, Cmd.none )
 
         GotUnits (Err error) ->
-            ( { model | isLoading = False, error = Just error }, Cmd.none )
+            ( { model | state = Error error }, Cmd.none )
 
 
 
@@ -88,16 +90,15 @@ view model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    if model.isLoading then
-        Html.p [] [ Html.text "Loading..." ]
+    case model.state of
+        IsLoading ->
+            Html.p [] [ Html.text "Loading..." ]
 
-    else
-        case model.error of
-            Just _ ->
-                Html.p [] [ Html.text "Something went wrong." ]
+        Error _ ->
+            Html.p [] [ Html.text "Something went wrong." ]
 
-            Nothing ->
-                Html.ul [ Attr.class "unit-list" ] (List.map viewUnit model.units)
+        Success units ->
+            Html.ul [ Attr.class "unit-list" ] (List.map viewUnit units)
 
 
 {-| TASK 3: Make this card useful. See the README.
