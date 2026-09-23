@@ -1,8 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html)
+import Html exposing (Html, button, div, h1, h2, li, main_, p, text, ul)
 import Html.Attributes as Attr
+import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
 import Style
@@ -63,6 +64,7 @@ fetchUnits =
 
 type Msg
     = GotUnits (Result Http.Error (List Unit))
+    | Retry
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -74,6 +76,9 @@ update msg model =
         GotUnits (Err error) ->
             ( { model | state = Error error }, Cmd.none )
 
+        Retry ->
+            ( { model | state = IsLoading }, fetchUnits )
+
 
 
 -- VIEW
@@ -81,9 +86,9 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Html.main_ [ Attr.class "page" ]
+    main_ [ Attr.class "page" ]
         [ Style.stylesheet
-        , Html.h1 [] [ Html.text "Find a storage unit" ]
+        , h1 [] [ text "Find a storage unit" ]
         , viewBody model
         ]
 
@@ -92,23 +97,42 @@ viewBody : Model -> Html Msg
 viewBody model =
     case model.state of
         IsLoading ->
-            Html.p [] [ Html.text "Loading..." ]
+            p [] [ text "Loading..." ]
 
-        Error _ ->
-            Html.p [] [ Html.text "Something went wrong." ]
+        Error error ->
+            div []
+                [ p [] [ text (viewErrorMessage error) ]
+                , button [ onClick Retry ] [ text "Try Again!" ]
+                ]
 
         Success units ->
-            Html.ul [ Attr.class "unit-list" ] (List.map viewUnit units)
+            ul [ Attr.class "unit-list" ] (List.map viewUnit units)
+
+
+viewErrorMessage : Http.Error -> String
+viewErrorMessage error =
+    case error of
+        Http.BadStatus status ->
+            "Bad Status: The server returned an error: Status (" ++ String.fromInt status ++ ")"
+
+        Http.Timeout ->
+            "Timeout: The server took to long to respond."
+
+        Http.NetworkError ->
+            "Network Error: Failed to reach the server. Is there a working internet connection?"
+
+        _ ->
+            "Error: Something went wrong on our end."
 
 
 {-| TASK 3: Make this card useful. See the README.
 -}
 viewUnit : Unit -> Html Msg
 viewUnit unit =
-    Html.li [ Attr.class "unit-card" ]
-        [ Html.h2 [] [ Html.text ("Unit " ++ Unit.name unit) ]
-        , Html.p []
-            [ Html.text
+    li [ Attr.class "unit-card" ]
+        [ h2 [] [ text ("Unit " ++ Unit.name unit) ]
+        , p []
+            [ text
                 (String.fromInt (Unit.widthFeet unit)
                     ++ " x "
                     ++ String.fromInt (Unit.lengthFeet unit)
