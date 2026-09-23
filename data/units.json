@@ -1,0 +1,16 @@
+{
+  "units": [
+    { "id": "A-101", "name": "A-101", "size": { "width": 5, "length": 5 }, "monthlyRateCents": 4900, "features": ["climate-controlled", "elevator"], "available": true, "promo": null },
+    { "id": "A-102", "name": "A-102", "size": { "width": 5, "length": 10 }, "monthlyRateCents": 7900, "features": ["climate-controlled"], "available": true, "promo": "First month $1" },
+    { "id": "A-215", "name": "A-215", "size": { "width": 5, "length": 10 }, "monthlyRateCents": 6900, "features": ["elevator"], "available": false, "promo": null },
+    { "id": "B-004", "name": "B-004", "size": { "width": 10, "length": 10 }, "monthlyRateCents": 12900, "features": ["drive-up"], "available": true, "promo": null },
+    { "id": "B-011", "name": "B-011", "size": { "width": 10, "length": 10 }, "monthlyRateCents": 14900, "features": ["climate-controlled", "ground-floor"], "available": true, "promo": "20% off 3 months" },
+    { "id": "B-017", "name": "B-017", "size": { "width": 10, "length": 15 }, "monthlyRateCents": 17900, "features": ["drive-up", "ground-floor"], "available": true, "promo": null },
+    { "id": "C-120", "name": "C-120", "size": { "width": 10, "length": 20 }, "monthlyRateCents": 22900, "features": ["climate-controlled", "ground-floor"], "available": false, "promo": null },
+    { "id": "C-121", "name": "C-121", "size": { "width": 10, "length": 20 }, "monthlyRateCents": 19900, "features": ["drive-up"], "available": true, "promo": "First month $1" },
+    { "id": "C-130", "name": "C-130", "size": { "width": 10, "length": 30 }, "monthlyRateCents": 28900, "features": ["drive-up", "ground-floor"], "available": true, "promo": null },
+    { "id": "D-001", "name": "D-001", "size": { "width": 4, "length": 6 }, "monthlyRateCents": 5900, "features": ["climate-controlled", "wine-storage"], "available": true, "promo": null },
+    { "id": "D-044", "name": "D-044", "size": { "width": 7, "length": 10 }, "monthlyRateCents": 10900, "features": [], "available": true, "promo": null },
+    { "id": "E-300", "name": "E-300", "size": { "width": 12, "length": 30 }, "monthlyRateCents": 32900, "features": ["drive-up", "climate-controlled"], "available": true, "promo": "20% off 3 months" }
+  ]
+}
