@@ -7,7 +7,7 @@ import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
 import Style
-import Unit exposing (Unit)
+import Unit exposing (Features(..), Unit)
 
 
 main : Program () Model Msg
@@ -138,4 +138,54 @@ viewUnit unit =
                     ++ String.fromInt (Unit.lengthFeet unit)
                 )
             ]
+        , p [] [ text (String.fromInt (Unit.monthlyRateCents unit)) ]
+        , p []
+            [ text
+                (if Unit.available unit == True then
+                    "Available"
+
+                 else
+                    "Unavailable"
+                )
+            ]
+        , viewUnitPromo (Unit.promo unit)
+        , viewUnitFeatures (Unit.features unit)
         ]
+
+
+viewUnitPromo : Maybe String -> Html Msg
+viewUnitPromo promo =
+    case promo of
+        Just value ->
+            p [] [ text value ]
+
+        Nothing ->
+            text ""
+
+
+viewUnitFeatures : List Features -> Html Msg
+viewUnitFeatures features =
+    ul []
+        (List.map (\feature -> li [] [ text (featureToString feature) ]) features)
+
+
+featureToString : Features -> String
+featureToString feature =
+    case feature of
+        ClimateControlled ->
+            "Climate Controlled"
+
+        Elevator ->
+            "Elevator Access"
+
+        DriveUp ->
+            "Drive-Up Access"
+
+        GroundFloor ->
+            "Ground Floor"
+
+        WineStorage ->
+            "Wine Storage"
+
+        Unknown rawString ->
+            ""

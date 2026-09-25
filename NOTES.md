@@ -75,6 +75,30 @@
   - My thought process behind this is if a feature is listed that isn't available for units, it is best to not show it to a potential customer and have them be surprised when it doesn't actually exist.
 - However, on the backend it should be let known of the failed value, as to find out if the units really do have a new feature or if it was a typo in the data.
 
+### Task 3
+
+- Decided on just displaying each piece of data on the unit card to start with.
+  - Was able to get fields `monthlyRateCents and available` to display without issue.
+
+**Displaying the promo field**
+- Got stuck on trying to parse the promos Maybe type in the view.
+  - Found a snippet at https://discourse.elm-lang.org/t/can-i-compose-a-view-with-a-number-of-maybe-components-in-a-more-efficient-way/4145
+  - With this, created a component `viewUnitPromo` with Maybe String parameter
+  - At first didn't know what to return for `Nothing` case, but found snippet used `text ""`, which seemed to work (didn't create a empty p element like I initially thought).
+
+**Displaying the features list**
+- Got stuck on trying to list features in view.
+  - Found a snippet on stackoverflow https://stackoverflow.com/questions/24004569/elm-how-do-i-display-a-list-of-strings-in-an-html-list
+  - Created a new view 'component' `viewUnitFeatures` and tried applying solutions from resource
+  - Changed parameter type to `Features`, which I was able to expose in `Unit.elm` (found out after looking how the Unit type was exposed in `Main.elm`)
+- Had type mismatch error `Expected 'List String' found 'List Features'` in new view component. 
+  - Used AI tool to diagnose issue
+    - First issue was only exposing the type name `Features` in the export / import statements in `Main/Unit.elm`. Fix was `Features(..)`.
+    - With newly exposed feature variants, able to create a helper to convert feature variants into string values.
+    - Updated `viewUnitFeatures` to use new helper and added it into the main `viewUnit` component.
+- Decided to *temporarily* return an empty string for the Unknown variant case to ensure a bad value is shown to the user of the site.
+
+- Created a commit once I had successfully displayed all new fields onto the card.
 
 ## What I finished
 

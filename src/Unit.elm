@@ -1,5 +1,6 @@
 module Unit exposing
-    ( Unit
+    ( Features(..)
+    , Unit
     , available
     , decoder
     , features
