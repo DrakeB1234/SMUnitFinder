@@ -2,3 +2,6 @@ elm-stuff/
 
 # OS generated files
 .DS_Store
+
+# Screenshots used in assignment
+screenshots/

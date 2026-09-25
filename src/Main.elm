@@ -1,13 +1,13 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, h1, h2, li, main_, p, text, ul)
+import Html exposing (Html, button, div, h1, h2, li, main_, p, small, span, text, ul)
 import Html.Attributes as Attr
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
 import Style
-import Unit exposing (Features(..), Unit)
+import Unit exposing (Features(..), Unit, available)
 
 
 main : Program () Model Msg
@@ -131,33 +131,51 @@ viewUnit : Unit -> Html Msg
 viewUnit unit =
     li [ Attr.class "unit-card" ]
         [ h2 [] [ text ("Unit " ++ Unit.name unit) ]
-        , p []
-            [ text
-                (String.fromInt (Unit.widthFeet unit)
-                    ++ " x "
-                    ++ String.fromInt (Unit.lengthFeet unit)
-                )
-            ]
-        , p [] [ text (String.fromInt (Unit.monthlyRateCents unit)) ]
-        , p []
-            [ text
-                (if Unit.available unit == True then
-                    "Available"
-
-                 else
-                    "Unavailable"
-                )
-            ]
-        , viewUnitPromo (Unit.promo unit)
+        , viewUnitSize (Unit.widthFeet unit) (Unit.lengthFeet unit) (Unit.squareFeet unit)
         , viewUnitFeatures (Unit.features unit)
+        , viewUnitPriceAvailable unit
         ]
+
+
+viewUnitPriceAvailable : Unit -> Html Msg
+viewUnitPriceAvailable unit =
+    if Unit.available unit then
+        div []
+            [ viewUnitPromo (Unit.promo unit)
+            , span [] [ text (unitMonthlyRateCents (Unit.monthlyRateCents unit)) ]
+            ]
+
+    else
+        div []
+            [ text "SOLD OUT"
+            ]
+
+
+viewUnitSize : Int -> Int -> Int -> Html Msg
+viewUnitSize widthFeet lengthFeet squareFeet =
+    div []
+        [ div []
+            [ span [] [ text (String.fromInt widthFeet ++ "'") ]
+            , small [] [ text "w" ]
+            , span [] [ text "X" ]
+            , span [] [ text (String.fromInt lengthFeet ++ "'") ]
+            , small [] [ text "d" ]
+            ]
+        , div []
+            [ text (String.fromInt squareFeet ++ " sq ft") ]
+        ]
+
+
+unitMonthlyRateCents : Int -> String
+unitMonthlyRateCents cents =
+    "$" ++ String.fromInt (cents // 100) ++ "/mo"
 
 
 viewUnitPromo : Maybe String -> Html Msg
 viewUnitPromo promo =
     case promo of
         Just value ->
-            p [] [ text value ]
+            span [] [ text value ]
 
         Nothing ->
             text ""

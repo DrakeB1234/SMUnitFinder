@@ -100,6 +100,33 @@
 
 - Created a commit once I had successfully displayed all new fields onto the card.
 
+**Formatting data**
+
+- Found https://github.com/Chadtech/elm-money package to find a potential solution to formatting `monthlyRateCents`, but couldn't find an example in there source for me to use.
+  - Created a helper, but got stuck on how to parse the data.
+  - Used AI tool to find out how to format the data
+    - Used `let` to create multiple variables.
+    - `dollars` used integer division `//`, which the reasoning from the AI was that Elm does not have a built-in `toFixed` method for floats.
+    - `centsRemainder` used `remainderBy` and `String.padLeft` to format the decimals place.
+  - Realized that the requested format was '$129/mo', without the decimals place.
+    - This simplified the helper to just using simple integer division.
+
+- For the readable storage unit sizes, I was unsure of the typical format used.
+  - I viewed units on storage-mart.com and saw some examples of the cards used there.
+    - Also took screenshot of card overall design / layout.
+  - Format being used was '5'w x 5'd x 8'h' and in span '25 sq ft (200 cu ft)'
+  - Heights are not defined in data, so just width x length (diameter) will be displayed in this case.
+- Got started on helper for showing unit size using two parameters 'widthFeet' and 'lengthFeet'.
+  - Was going to use `let` and `in` for calculating squareFeet, but then remembered that that was already calculated on the `Unit` record. Added squareFeet as an additional param in helper.
+  - Following the markup using on storage-mart.com, I created the html elements following how it is laid out on the actual website.
+
+- Changed the CSS with the cards sizing, changing the minmax function to `minmax(400px, 1fr)" for more space in cards on desktop. Still responsive due to grid layout on mobile.
+
+- Displaying if a unit is available
+  - On storage mart, it seems to make it clear if a unit is available or not, they will either display the price / promor OR 'SOLD OUT'
+  - Created component `viewUnitPriceAvailable` to handle these cases.
+  - Changed parameter to `Unit` due to needing more than four fields from it.
+
 ## What I finished
 
 ## Decisions I made and why
