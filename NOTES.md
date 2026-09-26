@@ -130,9 +130,30 @@
 
 ### Task 4
 
-- Creating markup for the layout of the filters + unit list.
+**Starting with markup**
+- I decided with writing markup first to have a way to test the filtering functions that I will later create.
   - Used similar markup to https://storage-mart.com for their filter.
   - Moved all markup into component `viewUnitFilter` and applied styling for filter.
+  - Thought to move the checkbox markup into a smaller component to reduce repeated code, but wouldn't know how to handle passing functions as parameters, skipped for now.
+
+**Writing the filter logic**
+- Looking back through the Main.elm file, I see the entire unit list is feed through the `viewBody` component. Chances are I would either feed the filtered results through here, or in the `viewUnit` component itself.
+- Reading through docs for *elm/core List*, I found that it does have a `List.filter` function, which could be needed for the filter logic.
+- Tried to write a filter helper, but couldn't find / understand a solution through searching through elm discuss forms / web searching.
+- Used AI tool for a potential solution.
+  - First created a SizeFilter type, to ensure that only one filter can be applied at a time.
+  - Added  `sizeFilter` and `climateOnly` to model and init blocks (`climateOnly` is a bool, but could later be switched to type for more filtering options.)
+  - Added types `FilterSize` and `ToggleClimateFilter` to Msg and added new functions into update block.
+  - Changed `viewUnitFilter` to accept the model, then set the climate checkbox attributes to accept the `climateOnly` variable and to call the `ToggleClimateFilter` function `onCheck`.
+  - Implemented the `unitFilter` helper to filter by climate controlled units. Size filter is not written yet.
+  - Finally, used the `unitFilter` helper into `viewBody` component to filter units before they are displayed in `viewUnit`. With testing, the checkbox would only show units that were climate controlled when toggled.
+- Implementing unit size filter
+  - Used attributes and `onClick` event in size filter checkboxes, then tried to implement the size filtering in helper `unitFilter`
+  - Had trouble intially trying to write the logic for filtering sizes, but after looking down through the helper, I realized that I am testing *each* list item through `List.filter`, was able to use this to write simple checks of square feet for each size filter case.
+
+**Writing the Sort Logic**
+- 
+
 
 
 ## What I finished

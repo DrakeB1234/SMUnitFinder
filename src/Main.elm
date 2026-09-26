@@ -2,12 +2,12 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, button, div, h1, h2, input, label, li, main_, p, small, span, text, ul)
-import Html.Attributes as Attr
-import Html.Events exposing (onClick)
+import Html.Attributes as Attr exposing (default)
+import Html.Events exposing (onCheck, onClick)
 import Http
 import Json.Decode as Decode
 import Style
-import Unit exposing (Features(..), Unit, available)
+import Unit exposing (Features(..), Unit)
 
 
 main : Program () Model Msg
@@ -37,14 +37,25 @@ type UnitState
     | Success (List Unit)
 
 
+type SizeFilter
+    = AnySize
+    | Small
+    | Medium
+    | Large
+
+
 type alias Model =
     { state : UnitState
+    , sizeFilter : SizeFilter
+    , climateOnly : Bool
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { state = IsLoading
+      , sizeFilter = AnySize
+      , climateOnly = False
       }
     , fetchUnits
     )
@@ -65,6 +76,8 @@ fetchUnits =
 type Msg
     = GotUnits (Result Http.Error (List Unit))
     | Retry
+    | FilterSize SizeFilter
+    | ToggleClimateFilter Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -78,6 +91,12 @@ update msg model =
 
         Retry ->
             ( { model | state = IsLoading }, fetchUnits )
+
+        FilterSize filter ->
+            ( { model | sizeFilter = filter }, Cmd.none )
+
+        ToggleClimateFilter newBool ->
+            ( { model | climateOnly = newBool }, Cmd.none )
 
 
 
@@ -107,8 +126,8 @@ viewBody model =
 
         Success units ->
             div []
-                [ viewUnitFilter
-                , ul [ Attr.class "unit-list" ] (List.map viewUnit units)
+                [ viewUnitFilter model
+                , ul [ Attr.class "unit-list" ] (List.map viewUnit (unitFilter model.sizeFilter model.climateOnly units))
                 ]
 
 
@@ -128,29 +147,79 @@ viewErrorMessage error =
             "Error: Something went wrong on our end."
 
 
-viewUnitFilter : Html Msg
-viewUnitFilter =
+viewUnitFilter : Model -> Html Msg
+viewUnitFilter model =
     div [ Attr.class "unit-filter" ]
         [ div [ Attr.class "unit-filter__title" ] [ text "STORAGE FILTER" ]
         , div [ Attr.class "unit-filter__checkboxes" ]
             [ div [ Attr.class "filter-checkbox__title" ] [ text "By Size" ]
             , div [ Attr.class "filter-checkbox" ]
                 [ label []
-                    [ input [ Attr.type_ "checkbox" ] []
+                    [ input
+                        [ Attr.type_ "checkbox"
+                        , Attr.checked
+                            (if model.sizeFilter == AnySize then
+                                True
+
+                             else
+                                False
+                            )
+                        , onClick (FilterSize AnySize)
+                        ]
+                        []
+                    , text "Any Size"
+                    ]
+                ]
+            , div [ Attr.class "filter-checkbox" ]
+                [ label []
+                    [ input
+                        [ Attr.type_ "checkbox"
+                        , Attr.checked
+                            (if model.sizeFilter == Small then
+                                True
+
+                             else
+                                False
+                            )
+                        , onClick (FilterSize Small)
+                        ]
+                        []
                     , text "Small"
-                    , span [ Attr.class "filter-checkbox__right-text" ] [ text "Up to 50 sq ft" ]
+                    , span [ Attr.class "filter-checkbox__right-text" ] [ text "Under 50 sq ft" ]
                     ]
                 ]
             , div [ Attr.class "filter-checkbox" ]
                 [ label []
-                    [ input [ Attr.type_ "checkbox" ] []
+                    [ input
+                        [ Attr.type_ "checkbox"
+                        , Attr.checked
+                            (if model.sizeFilter == Medium then
+                                True
+
+                             else
+                                False
+                            )
+                        , onClick (FilterSize Medium)
+                        ]
+                        []
                     , text "Medium"
-                    , span [ Attr.class "filter-checkbox__right-text" ] [ text "Up to 150 sq ft" ]
+                    , span [ Attr.class "filter-checkbox__right-text" ] [ text "50 to 150 sq ft" ]
                     ]
                 ]
             , div [ Attr.class "filter-checkbox" ]
                 [ label []
-                    [ input [ Attr.type_ "checkbox" ] []
+                    [ input
+                        [ Attr.type_ "checkbox"
+                        , Attr.checked
+                            (if model.sizeFilter == Large then
+                                True
+
+                             else
+                                False
+                            )
+                        , onClick (FilterSize Large)
+                        ]
+                        []
                     , text "Large"
                     , span [ Attr.class "filter-checkbox__right-text" ] [ text "Over 150 sq ft" ]
                     ]
@@ -160,7 +229,12 @@ viewUnitFilter =
             [ div [ Attr.class "filter-checkbox__title" ] [ text "By Feature" ]
             , div [ Attr.class "filter-checkbox" ]
                 [ label []
-                    [ input [ Attr.type_ "checkbox" ] []
+                    [ input
+                        [ Attr.type_ "checkbox"
+                        , Attr.checked model.climateOnly
+                        , onCheck ToggleClimateFilter
+                        ]
+                        []
                     , text "Climate Controlled"
                     ]
                 ]
@@ -173,7 +247,47 @@ viewUnitFilter =
 
 
 
--- Unit Components
+-- Unit Components / Helpers
+
+
+unitFilter : SizeFilter -> Bool -> List Unit -> List Unit
+unitFilter sizeFilter climateOnly units =
+    units
+        |> List.filter
+            (\unit ->
+                if climateOnly then
+                    List.member ClimateControlled (Unit.features unit)
+
+                else
+                    True
+            )
+        |> List.filter
+            (\unit ->
+                case sizeFilter of
+                    AnySize ->
+                        True
+
+                    Small ->
+                        if Unit.squareFeet unit < 50 then
+                            True
+
+                        else
+                            False
+
+                    Medium ->
+                        if Unit.squareFeet unit >= 50 && Unit.squareFeet unit <= 150 then
+                            True
+
+                        else
+                            False
+
+                    Large ->
+                        if Unit.squareFeet unit > 150 then
+                            True
+
+                        else
+                            False
+            )
 
 
 viewUnit : Unit -> Html Msg
