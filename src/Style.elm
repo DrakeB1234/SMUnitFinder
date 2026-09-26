@@ -57,4 +57,48 @@ body {
   outline: 3px solid #1f5fbf;
   outline-offset: 2px;
 }
+
+/* Filters */
+
+.unit-filter {
+  display: block;
+  border-radius: 8px;
+  border: 1px solid #d9dde3;
+  overflow: hidden;
+}
+
+.unit-filter__title {
+  padding: 0.75rem 1rem;
+  background-color: hsl(220, 10%, 92%);
+  font-weight: 600;
+}
+
+.unit-filter__checkboxes {
+  background-color: #fff;
+  padding: 1rem;
+}
+
+.filter-checkbox__title {
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid #d9dde3;
+}
+
+.filter-checkbox {
+  margin-block: 0.75rem;
+}
+
+.filter-checkbox input {
+  margin-right: 0.5rem;
+}
+
+.filter-checkbox label {
+  display: block;
+  width: 100%;
+}
+
+.filter-checkbox__right-text {
+  margin-left: 1.5rem;
+  font-size: 0.875rem;
+}
+
 """

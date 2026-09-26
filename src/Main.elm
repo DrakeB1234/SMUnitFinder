@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, h1, h2, li, main_, p, small, span, text, ul)
+import Html exposing (Html, button, div, h1, h2, input, label, li, main_, p, small, span, text, ul)
 import Html.Attributes as Attr
 import Html.Events exposing (onClick)
 import Http
@@ -106,7 +106,10 @@ viewBody model =
                 ]
 
         Success units ->
-            ul [ Attr.class "unit-list" ] (List.map viewUnit units)
+            div []
+                [ viewUnitFilter
+                , ul [ Attr.class "unit-list" ] (List.map viewUnit units)
+                ]
 
 
 viewErrorMessage : Http.Error -> String
@@ -125,8 +128,54 @@ viewErrorMessage error =
             "Error: Something went wrong on our end."
 
 
+viewUnitFilter : Html Msg
+viewUnitFilter =
+    div [ Attr.class "unit-filter" ]
+        [ div [ Attr.class "unit-filter__title" ] [ text "STORAGE FILTER" ]
+        , div [ Attr.class "unit-filter__checkboxes" ]
+            [ div [ Attr.class "filter-checkbox__title" ] [ text "By Size" ]
+            , div [ Attr.class "filter-checkbox" ]
+                [ label []
+                    [ input [ Attr.type_ "checkbox" ] []
+                    , text "Small"
+                    , span [ Attr.class "filter-checkbox__right-text" ] [ text "Up to 50 sq ft" ]
+                    ]
+                ]
+            , div [ Attr.class "filter-checkbox" ]
+                [ label []
+                    [ input [ Attr.type_ "checkbox" ] []
+                    , text "Medium"
+                    , span [ Attr.class "filter-checkbox__right-text" ] [ text "Up to 150 sq ft" ]
+                    ]
+                ]
+            , div [ Attr.class "filter-checkbox" ]
+                [ label []
+                    [ input [ Attr.type_ "checkbox" ] []
+                    , text "Large"
+                    , span [ Attr.class "filter-checkbox__right-text" ] [ text "Over 150 sq ft" ]
+                    ]
+                ]
+            ]
+        , div [ Attr.class "unit-filter__checkboxes" ]
+            [ div [ Attr.class "filter-checkbox__title" ] [ text "By Feature" ]
+            , div [ Attr.class "filter-checkbox" ]
+                [ label []
+                    [ input [ Attr.type_ "checkbox" ] []
+                    , text "Climate Controlled"
+                    ]
+                ]
+            ]
+        ]
+
+
 {-| TASK 3: Make this card useful. See the README.
 -}
+
+
+
+-- Unit Components
+
+
 viewUnit : Unit -> Html Msg
 viewUnit unit =
     li [ Attr.class "unit-card" ]

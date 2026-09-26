@@ -96,7 +96,8 @@
     - First issue was only exposing the type name `Features` in the export / import statements in `Main/Unit.elm`. Fix was `Features(..)`.
     - With newly exposed feature variants, able to create a helper to convert feature variants into string values.
     - Updated `viewUnitFeatures` to use new helper and added it into the main `viewUnit` component.
-- Decided to *temporarily* return an empty string for the Unknown variant case to ensure a bad value is shown to the user of the site.
+- Decided to return an empty string for the Unknown variant case to ensure a bad value is shown to the user of the site.
+  - Explained reasoning in section titled *How I plan to handle unrecognized features*
 
 - Created a commit once I had successfully displayed all new fields onto the card.
 
@@ -126,6 +127,13 @@
   - On storage mart, it seems to make it clear if a unit is available or not, they will either display the price / promor OR 'SOLD OUT'
   - Created component `viewUnitPriceAvailable` to handle these cases.
   - Changed parameter to `Unit` due to needing more than four fields from it.
+
+### Task 4
+
+- Creating markup for the layout of the filters + unit list.
+  - Used similar markup to https://storage-mart.com for their filter.
+  - Moved all markup into component `viewUnitFilter` and applied styling for filter.
+
 
 ## What I finished
 
