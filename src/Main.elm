@@ -1,9 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, h1, h2, input, label, li, main_, p, small, span, text, ul)
+import Html exposing (Html, button, div, h1, h2, input, label, li, main_, option, p, select, small, span, text, ul)
 import Html.Attributes as Attr exposing (default)
-import Html.Events exposing (onCheck, onClick)
+import Html.Events exposing (onCheck, onClick, onInput)
 import Http
 import Json.Decode as Decode
 import Style
@@ -44,10 +44,17 @@ type SizeFilter
     | Large
 
 
+type UnitSort
+    = Name
+    | PriceLowToHigh
+    | PriceHighToLow
+
+
 type alias Model =
     { state : UnitState
     , sizeFilter : SizeFilter
     , climateOnly : Bool
+    , unitSort : UnitSort
     }
 
 
@@ -56,6 +63,7 @@ init _ =
     ( { state = IsLoading
       , sizeFilter = AnySize
       , climateOnly = False
+      , unitSort = Name
       }
     , fetchUnits
     )
@@ -78,6 +86,7 @@ type Msg
     | Retry
     | FilterSize SizeFilter
     | ToggleClimateFilter Bool
+    | SortChanged UnitSort
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -97,6 +106,9 @@ update msg model =
 
         ToggleClimateFilter newBool ->
             ( { model | climateOnly = newBool }, Cmd.none )
+
+        SortChanged sortType ->
+            ( { model | unitSort = sortType }, Cmd.none )
 
 
 
@@ -127,7 +139,9 @@ viewBody model =
         Success units ->
             div []
                 [ viewUnitFilter model
-                , ul [ Attr.class "unit-list" ] (List.map viewUnit (unitFilter model.sizeFilter model.climateOnly units))
+                , viewUnitSort
+                , viewAmountOfUnits units (unitFilter model.sizeFilter model.climateOnly units)
+                , ul [ Attr.class "unit-list" ] (List.map viewUnit (unitSort model.unitSort (unitFilter model.sizeFilter model.climateOnly units)))
                 ]
 
 
@@ -145,6 +159,10 @@ viewErrorMessage error =
 
         _ ->
             "Error: Something went wrong on our end."
+
+
+
+-- Filter / Sort Unit Helpers
 
 
 viewUnitFilter : Model -> Html Msg
@@ -242,12 +260,34 @@ viewUnitFilter model =
         ]
 
 
-{-| TASK 3: Make this card useful. See the README.
--}
+viewUnitSort : Html Msg
+viewUnitSort =
+    div [ Attr.class "unit-sort" ]
+        [ label []
+            [ text "SORT BY"
+            , select [ onInput handleUnitSortString ]
+                [ option [ Attr.value "name" ] [ text "Name" ]
+                , option [ Attr.value "price-low-to-high" ] [ text "Price: low to high" ]
+                , option [ Attr.value "price-high-to-low" ] [ text "Price: high to low" ]
+                ]
+            ]
+        ]
 
 
+handleUnitSortString : String -> Msg
+handleUnitSortString string =
+    case string of
+        "name" ->
+            SortChanged Name
 
--- Unit Components / Helpers
+        "price-low-to-high" ->
+            SortChanged PriceLowToHigh
+
+        "price-high-to-low" ->
+            SortChanged PriceHighToLow
+
+        _ ->
+            SortChanged Name
 
 
 unitFilter : SizeFilter -> Bool -> List Unit -> List Unit
@@ -290,6 +330,36 @@ unitFilter sizeFilter climateOnly units =
             )
 
 
+unitSort : UnitSort -> List Unit -> List Unit
+unitSort sortType units =
+    case sortType of
+        Name ->
+            List.sortBy (\unit -> Unit.name unit) units
+
+        PriceLowToHigh ->
+            List.sortBy (\unit -> Unit.monthlyRateCents unit) units
+
+        PriceHighToLow ->
+            units
+                |> List.sortBy (\unit -> Unit.monthlyRateCents unit)
+                |> List.reverse
+
+
+viewAmountOfUnits : List Unit -> List Unit -> Html Msg
+viewAmountOfUnits totalUnits filteredUnits =
+    div [ Attr.class "unit-shown" ]
+        [ span [] [ text ("Showing " ++ String.fromInt (List.length filteredUnits) ++ " of " ++ String.fromInt (List.length totalUnits) ++ " units.") ]
+        ]
+
+
+{-| TASK 3: Make this card useful. See the README.
+-}
+
+
+
+-- Unit Components
+
+
 viewUnit : Unit -> Html Msg
 viewUnit unit =
     li [ Attr.class "unit-card" ]
@@ -316,15 +386,15 @@ viewUnitPriceAvailable unit =
 
 viewUnitSize : Int -> Int -> Int -> Html Msg
 viewUnitSize widthFeet lengthFeet squareFeet =
-    div []
-        [ div []
-            [ span [] [ text (String.fromInt widthFeet ++ "'") ]
+    div [ Attr.class "unit-size" ]
+        [ div [ Attr.class "unit-dimensions" ]
+            [ span [ Attr.class "unit-dimensions__number" ] [ text (String.fromInt widthFeet ++ "'") ]
             , small [] [ text "w" ]
-            , span [] [ text "X" ]
-            , span [] [ text (String.fromInt lengthFeet ++ "'") ]
+            , span [ Attr.class "unit-dimensions__spacer" ] [ text "X" ]
+            , span [ Attr.class "unit-dimensions__number" ] [ text (String.fromInt lengthFeet ++ "'") ]
             , small [] [ text "d" ]
             ]
-        , div []
+        , div [ Attr.class "unit-size__squarefeet" ]
             [ text (String.fromInt squareFeet ++ " sq ft") ]
         ]
 

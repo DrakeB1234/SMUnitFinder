@@ -152,9 +152,31 @@
   - Had trouble intially trying to write the logic for filtering sizes, but after looking down through the helper, I realized that I am testing *each* list item through `List.filter`, was able to use this to write simple checks of square feet for each size filter case.
 
 **Writing the Sort Logic**
-- 
+- Started by creating the markup and styling, creating a `viewUnitSort` component.
+  - Used https://dribbble.com/shots/2484536-Sort-by as a resource for UI, decided to use a *select* element for a11y and single active selection.
+- Thought that my code code be better organized, looked through file and decided to sort by *filter and sort helpers* and *unit components* using comments.
+- Using a similar process as I did for the filtering, created sort type, then added it to model, init, and update blocks.
+- Referring to docs for List, I found the `sortBy` list function, which I used in new `unitSort` helper.
+  - Decided on using case statements, as this function didn't need the more complex ordering that the filter helper required; sorted by monthlyRateCents, which after testing, correctly sorted by price low to high.
+- Got stuck on the *price high to low* sorting logic, intially tried to use `List.sortWith` and its example of a comparsion helper in docs.
+  - Used AI tool to fix the issue.
+    - There were two options, one with a simple sortBy then reverse, and a compare function (like I had previously tried) but using the proper typing signature as I was comparing the entire Unit record instead of its 'monthlyRateCents` field.
+    - I stuck with the sort then reverse, as it was simple and was easy to read / understand.
+- Testing the sorting
+  - I had not yet wired up the select element, so I just changed the init value for `unitSort` to try all type variants. After testing, each option seemed to work as expected.
+- Wiring up the select element
+  - The previous AI prompt had a solution, but I wanted to check online for how others handled this. Found resource: https://stackoverflow.com/questions/37376509/work-with-elm-and-select.
+  - I found the stackoverflow answer helpful, but liked how the previous AI response handled the raw string parsing in a separate helper RATHER than in the update block. I was also able to fix the compiler issue of missing cases by adding a wildcard case at the end in helper `handleUnitSortString`.
+  - Tested the sorting through the select element, and everything seemed to be working and is wired up correctly.
 
+**Displaying the amount of units shown**
+- Sticking with the use of components, I created a `viewAmountOfUnits` component to display to the user the amount of *shown* units and *total* units.
+- Found a way to test empty state by modifying the filter helper to return `False` in one case. This component would display "Showing 0 of 12 units." when no units are found.
+- *Potential future issue* I question my current approach due to having to call the filter method for one of the params of the `viewAmountOfUnits` component AND also having to use it for the `viewUnit` component.
+  - The problem with this is if the filtering logic were to change, now two places would require refactoring. If I have time to find a better alternative, I will apply and document it.
 
+**More testing of different states between filtering and sorting**
+- I realized that I forgot to account for filtering THEN sorting the resulting list. Before I had just tested the sorting on the default filtering options.
 
 ## What I finished
 
